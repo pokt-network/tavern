@@ -1,0 +1,25 @@
+{
+  "name": "tavern",
+  "version": "0.0.1",
+  "description": "A smart contract system to create and complete quests",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luyzdeleon/tavern.git"
+  },
+  "author": "Luis C. de Leon",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/luyzdeleon/tavern/issues"
+  },
+  "homepage": "https://github.com/luyzdeleon/tavern#readme",
+  "dependencies": {
+    "openzeppelin-solidity": "^1.9.0"
+  }
+}
