@@ -68,4 +68,9 @@ contract Tavern {
     function getQuest(uint _questID) public constant returns (address creator, uint id, string name, string hint, bytes32 merkleRoot, uint numTokens, string uri) {
         return (quests[_questID].creator, quests[_questID].id, quests[_questID].name, quests[_questID].hint, quests[_questID].merkleRoot, quests[_questID].numTokens, quests[_questID].uri);
     }
+
+    // Get QuestToken address
+    function getQuestTokenAddress() public constant returns (address) {
+        return address(questToken);
+    }
 }
