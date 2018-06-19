@@ -1,0 +1,11 @@
+{
+  "name": "tavern",
+  "version": "0.0.1",
+  "contracts": {
+    "Tavern": "Tavern"
+  },
+  "stdlib": {
+    "name": "openzeppelin-zos",
+    "version": "1.9.1"
+  }
+}
