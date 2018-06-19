@@ -3,7 +3,7 @@ pragma solidity ^0.4.2;
 import "openzeppelin-zos/contracts/MerkleProof.sol";
 import "zos-lib/contracts/migrations/Migratable.sol";
 
-contract Tavern is Migratable{
+contract Tavern is Migratable {
 
     function initialize() isInitializer("Tavern", "0.0.1") public {
     }
