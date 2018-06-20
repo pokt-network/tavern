@@ -61,5 +61,4 @@ typings/
 .next
 
 build/
-
-*.local.json
+zos.local.json

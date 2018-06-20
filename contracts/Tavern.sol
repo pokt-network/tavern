@@ -11,13 +11,13 @@ contract Tavern is Migratable {
     // Quest model
     struct Quest {
         address creator;
-        uint id;
+        uint index;
         string name;
         string hint;
         bytes32 merkleRoot;
-        uint numTokens;
-        string uri;
+        uint maxWinners;
         address[] winners;
+        string metadata;
     }
 
     // State
@@ -25,16 +25,16 @@ contract Tavern is Migratable {
     uint[] public questsIndex;
 
     // Creates a new quest
-    function createQuest(string _name, string _hint, uint _numTokens, bytes32 _merkleRoot, string _uri) public {
+    function createQuest(string _name, string _hint, uint _numTokens, bytes32 _merkleRoot, string _metadata) public {
         Quest memory newQuest;
-        uint256 questId = questsIndex.length;
+        uint256 questIndex = questsIndex.length;
         newQuest.creator = msg.sender;
-        newQuest.id = questId;
+        newQuest.index = questIndex;
         newQuest.name = _name;
         newQuest.hint = _hint;
         newQuest.merkleRoot = _merkleRoot;
-        newQuest.uri = _uri;
-        newQuest.numTokens = _numTokens;
+        newQuest.maxWinners = maxWinners;
+        newQuest.metadata = _metadata;
         quests[questId] = newQuest;
         questsIndex.push(questId);
     }
