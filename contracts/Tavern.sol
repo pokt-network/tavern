@@ -1,43 +1,40 @@
 pragma solidity ^0.4.2;
 
-import "./QuestToken.sol";
-import "openzeppelin-solidity/contracts/MerkleProof.sol";
+import "openzeppelin-zos/contracts/MerkleProof.sol";
+import "zos-lib/contracts/migrations/Migratable.sol";
 
-contract Tavern {
+contract Tavern is Migratable {
+
+    function initialize() isInitializer("Tavern", "0.0.1") public {
+    }
 
     // Quest model
     struct Quest {
         address creator;
-        uint id;
+        uint index;
         string name;
         string hint;
         bytes32 merkleRoot;
-        uint numTokens;
-        string uri;
+        uint maxWinners;
         address[] winners;
+        string metadata;
     }
 
     // State
     mapping (uint => Quest) public quests;
     uint[] public questsIndex;
-    QuestToken public questToken;
-
-    // Constructor
-    function Tavern() public {
-        questToken = new QuestToken();
-    }
 
     // Creates a new quest
-    function createQuest(string _name, string _hint, uint _numTokens, bytes32 _merkleRoot, string _uri) public {
+    function createQuest(string _name, string _hint, uint _numTokens, bytes32 _merkleRoot, string _metadata) public {
         Quest memory newQuest;
-        uint256 questId = questsIndex.length;
+        uint256 questIndex = questsIndex.length;
         newQuest.creator = msg.sender;
-        newQuest.id = questId;
+        newQuest.index = questIndex;
         newQuest.name = _name;
         newQuest.hint = _hint;
         newQuest.merkleRoot = _merkleRoot;
-        newQuest.uri = _uri;
-        newQuest.numTokens = _numTokens;
+        newQuest.maxWinners = maxWinners;
+        newQuest.metadata = _metadata;
         quests[questId] = newQuest;
         questsIndex.push(questId);
     }
@@ -54,7 +51,8 @@ contract Tavern {
 
         // Verify merkle proof and mint reward
         if(MerkleProof.verifyProof(_pathToRoot, quests[_questID].merkleRoot, _proof)){
-            questToken.mintTo(msg.sender, quests[_questID].uri);
+            // TODO: Mint new ERC721+Tavern
+            //questToken.mintTo(msg.sender, quests[_questID].uri);
             quests[_questID].winners.push(msg.sender);
         }
     }
@@ -67,10 +65,5 @@ contract Tavern {
     // Get the quest data
     function getQuest(uint _questID) public constant returns (address creator, uint id, string name, string hint, bytes32 merkleRoot, uint numTokens, string uri) {
         return (quests[_questID].creator, quests[_questID].id, quests[_questID].name, quests[_questID].hint, quests[_questID].merkleRoot, quests[_questID].numTokens, quests[_questID].uri);
-    }
-
-    // Get QuestToken address
-    function getQuestTokenAddress() public constant returns (address) {
-        return address(questToken);
     }
 }
