@@ -25,7 +25,7 @@ contract Tavern is Migratable {
     uint[] public questsIndex;
 
     // Creates a new quest
-    function createQuest(string _name, string _hint, uint _numTokens, bytes32 _merkleRoot, string _metadata) public {
+    function createQuest(string _name, string _hint, uint _maxWinners, bytes32 _merkleRoot, string _metadata) public {
         Quest memory newQuest;
         uint256 questIndex = questsIndex.length;
         newQuest.creator = msg.sender;
@@ -33,7 +33,7 @@ contract Tavern is Migratable {
         newQuest.name = _name;
         newQuest.hint = _hint;
         newQuest.merkleRoot = _merkleRoot;
-        newQuest.maxWinners = maxWinners;
+        newQuest.maxWinners = _maxWinners;
         newQuest.metadata = _metadata;
         quests[questId] = newQuest;
         questsIndex.push(questId);
