@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity ^0.4.24;
 
 /**
  * @title TavernQuestReward
@@ -9,5 +9,5 @@ contract TavernQuestReward {
     function validateQuest(string _name, string _hint, uint _maxWinners, bytes32 _merkleRoot, string _metadata) public returns (bool);
 
     // Mint reward
-    function rewardCompletion(address _tavern, address _winner, uint _questIndex, uint _winnerIndex) public returns (bool);
+    function rewardCompletion(address _tavern, address _winner, uint _questIndex) public returns (bool);
 }
