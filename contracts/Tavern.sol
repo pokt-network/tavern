@@ -173,19 +173,19 @@ contract Tavern is Migratable {
         return quests[_tokenAddress][_questIndex].valid;
     }
 
-    function getQuestWinners(address _tokenAddress, uint _questIndex) public view returns(address[]) {
-        return quests[_tokenAddress][_questIndex].winnersIndex;
-    }
-
-    function getQuestClaimers(address _tokenAddress, uint _questIndex) public view returns(address[]) {
-        return quests[_tokenAddress][_questIndex].claimersIndex;
-    }
-
     function getQuestWinnersAmount(address _tokenAddress, uint _questIndex) public view returns(uint) {
         return quests[_tokenAddress][_questIndex].winnersIndex.length;
     }
 
     function getQuestClaimersAmount(address _tokenAddress, uint _questIndex) public view returns(uint) {
         return quests[_tokenAddress][_questIndex].claimersIndex.length;
+    }
+
+    function getQuestWinner(address _tokenAddress, uint _questIndex, uint _winnerIndex) public view returns(address) {
+        return quests[_tokenAddress][_questIndex].winnersIndex[_winnerIndex];
+    }
+
+    function getQuestClaimer(address _tokenAddress, uint _questIndex, uint _claimerIndex) public view returns(address) {
+        return quests[_tokenAddress][_questIndex].claimersIndex[_claimerIndex];
     }
 }
