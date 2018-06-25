@@ -29,6 +29,12 @@ contract Tavern is Migratable {
     mapping (address => Quest[]) quests;
     mapping (address => mapping (address => uint[])) questsPerCreator;
 
+    // Events
+    event QuestCreated(address _tokenAddress, uint _questIndex);
+    event QuestValidated(address _tokenAddress, uint _questIndex);
+    event QuestCompleted(address _tokenAddress, uint _questIndex, address _winner);
+    event QuestRewardClaimed(address _tokenAddress, uint _questIndex, address _claimer);
+
     // Creates a new quest
     function createQuest(address _tokenAddress, string _name, string _hint, uint _maxWinners, bytes32 _merkleRoot, string _metadata) public {
         // If the quest is valid, create it
@@ -46,6 +52,9 @@ contract Tavern is Migratable {
         quests[_tokenAddress].push(newQuest);
         questsPerCreator[_tokenAddress][msg.sender].push(questIndex);
 
+        // Emit event
+        emit QuestCreated(_tokenAddress, questIndex);
+
         // Validate quest
         validateQuest(_tokenAddress, questIndex);
     }
@@ -56,13 +65,19 @@ contract Tavern is Migratable {
         require(quests[_tokenAddress][_questIndex].valid == false);
 
         TavernQuestReward tokenInterface = TavernQuestReward(_tokenAddress);
-        quests[_tokenAddress][_questIndex].valid = tokenInterface.validateQuest(
+        bool isValid = tokenInterface.validateQuest(
             quests[_tokenAddress][_questIndex].name,
             quests[_tokenAddress][_questIndex].hint,
             quests[_tokenAddress][_questIndex].maxWinners,
             quests[_tokenAddress][_questIndex].merkleRoot,
             quests[_tokenAddress][_questIndex].metadata
         );
+        if (isValid == true) {
+            // Update state
+            quests[_tokenAddress][_questIndex].valid = isValid;
+            // Emit event
+            emit QuestValidated(_tokenAddress, _questIndex);
+        }
     }
 
     // Submits proof of quest completion and mints reward
@@ -88,6 +103,9 @@ contract Tavern is Migratable {
         quests[_tokenAddress][_questIndex].winners[msg.sender] = true;
         quests[_tokenAddress][_questIndex].winnersIndex.push(msg.sender);
 
+        // Emit event
+        emit QuestCompleted(_tokenAddress, _questIndex, msg.sender);
+
         // Mint reward
         claimReward(_tokenAddress, _questIndex);
     }
@@ -108,6 +126,9 @@ contract Tavern is Migratable {
             // Add to claimers lists
             quests[_tokenAddress][_questIndex].claimers[msg.sender] = true;
             quests[_tokenAddress][_questIndex].claimersIndex.push(msg.sender);
+
+            // Emit event
+            emit QuestRewardClaimed(_tokenAddress, _questIndex, msg.sender);
         }
     }
 
