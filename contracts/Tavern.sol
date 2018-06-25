@@ -120,4 +120,60 @@ contract Tavern is Migratable {
     function isClaimer(address _tokenAddress, uint _questIndex, address _allegedClaimer) public view returns (bool) {
         return quests[_tokenAddress][_questIndex].winners[_allegedClaimer];
     }
+
+    function getQuest(address _tokenAddress, uint _questIndex) public view returns (address,
+        uint, string, string, bytes32, uint, string, bool, uint, uint) {
+        Quest memory quest = quests[_tokenAddress][_questIndex];
+
+        return (quest.creator, quest.index, quest.name, quest.hint, quest.merkleRoot, quest.maxWinners,
+            quest.metadata, quest.valid, quest.winnersIndex.length, quest.claimersIndex.length);
+    }
+
+    function getQuestCreator(address _tokenAddress, uint _questIndex) public view returns(address) {
+        return quests[_tokenAddress][_questIndex].creator;
+    }
+
+    function getQuestIndex(address _tokenAddress, uint _questIndex) public view returns(uint) {
+        return quests[_tokenAddress][_questIndex].index;
+    }
+
+    function getQuestName(address _tokenAddress, uint _questIndex) public view returns(string) {
+        return quests[_tokenAddress][_questIndex].name;
+    }
+
+    function getQuestHint(address _tokenAddress, uint _questIndex) public view returns(string) {
+        return quests[_tokenAddress][_questIndex].hint;
+    }
+
+    function getQuestMerkleRoot(address _tokenAddress, uint _questIndex) public view returns(bytes32) {
+        return quests[_tokenAddress][_questIndex].merkleRoot;
+    }
+
+    function getQuestMaxWinners(address _tokenAddress, uint _questIndex) public view returns(uint) {
+        return quests[_tokenAddress][_questIndex].maxWinners;
+    }
+
+    function getQuestMetadata(address _tokenAddress, uint _questIndex) public view returns(string) {
+        return quests[_tokenAddress][_questIndex].metadata;
+    }
+
+    function getQuestValid(address _tokenAddress, uint _questIndex) public view returns(bool) {
+        return quests[_tokenAddress][_questIndex].valid;
+    }
+
+    function getQuestWinners(address _tokenAddress, uint _questIndex) public view returns(address[]) {
+        return quests[_tokenAddress][_questIndex].winnersIndex;
+    }
+
+    function getQuestClaimers(address _tokenAddress, uint _questIndex) public view returns(address[]) {
+        return quests[_tokenAddress][_questIndex].claimersIndex;
+    }
+
+    function getQuestWinnersAmount(address _tokenAddress, uint _questIndex) public view returns(uint) {
+        return quests[_tokenAddress][_questIndex].winnersIndex.length;
+    }
+
+    function getQuestClaimersAmount(address _tokenAddress, uint _questIndex) public view returns(uint) {
+        return quests[_tokenAddress][_questIndex].claimersIndex.length;
+    }
 }
