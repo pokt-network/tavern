@@ -1,10 +1,10 @@
 pragma solidity ^0.4.24;
 
 import "openzeppelin-zos/contracts/MerkleProof.sol";
-import "zos-lib/contracts/migrations/Migratable.sol";
+import "openzeppelin-zos/contracts/ownership/Ownable.sol";
 import "./TavernQuestReward.sol";
 
-contract Tavern is Migratable {
+contract Tavern is Ownable {
 
     function initialize() isInitializer("Tavern", "0.0.1") public {
     }
@@ -66,6 +66,7 @@ contract Tavern is Migratable {
 
         TavernQuestReward tokenInterface = TavernQuestReward(_tokenAddress);
         bool isValid = tokenInterface.validateQuest(
+            quests[_tokenAddress][_questIndex].creator,
             quests[_tokenAddress][_questIndex].name,
             quests[_tokenAddress][_questIndex].hint,
             quests[_tokenAddress][_questIndex].maxWinners,
