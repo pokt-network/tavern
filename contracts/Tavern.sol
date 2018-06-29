@@ -2,9 +2,11 @@ pragma solidity ^0.4.24;
 
 import "openzeppelin-zos/contracts/MerkleProof.sol";
 import "openzeppelin-zos/contracts/ownership/Ownable.sol";
+import "openzeppelin-zos/contracts/math/SafeMath.sol";
 import "./TavernQuestReward.sol";
 
 contract Tavern is Ownable {
+    using SafeMath for uint;
 
     function initialize() isInitializer("Tavern", "0.0.1") public {
     }
@@ -19,6 +21,7 @@ contract Tavern is Ownable {
         uint maxWinners;
         string metadata;
         bool valid;
+        uint prize;
         mapping (address => bool) winners;
         address[] winnersIndex;
         mapping (address => bool) claimers;
@@ -28,15 +31,17 @@ contract Tavern is Ownable {
     // State
     mapping (address => Quest[]) quests;
     mapping (address => mapping (address => uint[])) questsPerCreator;
+    uint currentOwnerBalance;
 
     // Events
     event QuestCreated(address _tokenAddress, uint _questIndex);
     event QuestValidated(address _tokenAddress, uint _questIndex);
     event QuestCompleted(address _tokenAddress, uint _questIndex, address _winner);
     event QuestRewardClaimed(address _tokenAddress, uint _questIndex, address _claimer);
+    event OwnerBalanceWithdrawn(address _owner, uint _balanceWithdrawn);
 
     // Creates a new quest
-    function createQuest(address _tokenAddress, string _name, string _hint, uint _maxWinners, bytes32 _merkleRoot, string _metadata) public {
+    function createQuest(address _tokenAddress, string _name, string _hint, uint _maxWinners, bytes32 _merkleRoot, string _metadata) public payable {
         // If the quest is valid, create it
         Quest memory newQuest;
         uint questIndex = quests[_tokenAddress].length;
@@ -47,6 +52,12 @@ contract Tavern is Ownable {
         newQuest.merkleRoot = _merkleRoot;
         newQuest.maxWinners = _maxWinners;
         newQuest.metadata = _metadata;
+        if (msg.value > 0) {
+            // If the quest has an eth prize require the amount of winners to be > 0
+            require(newQuest.maxWinners > 0);
+            newQuest.prize = msg.value * SafeMath.div(9, 10);
+            currentOwnerBalance += msg.value * SafeMath.div(1, 10);
+        }
 
         // Save quest
         quests[_tokenAddress].push(newQuest);
@@ -71,7 +82,8 @@ contract Tavern is Ownable {
             quests[_tokenAddress][_questIndex].hint,
             quests[_tokenAddress][_questIndex].maxWinners,
             quests[_tokenAddress][_questIndex].merkleRoot,
-            quests[_tokenAddress][_questIndex].metadata
+            quests[_tokenAddress][_questIndex].metadata,
+            quests[_tokenAddress][_questIndex].prize
         );
         if (isValid == true) {
             // Update state
@@ -104,6 +116,11 @@ contract Tavern is Ownable {
         quests[_tokenAddress][_questIndex].winners[msg.sender] = true;
         quests[_tokenAddress][_questIndex].winnersIndex.push(msg.sender);
 
+        // Dispense Eth Prize
+        if (getQuestPrize(_tokenAddress, _questIndex) > 0 && getQuestMaxWinners(_tokenAddress, _questIndex) > 0) {
+            msg.sender.transfer(getQuestUnitPrize(_tokenAddress, _questIndex));
+        }
+
         // Emit event
         emit QuestCompleted(_tokenAddress, _questIndex, msg.sender);
 
@@ -131,6 +148,23 @@ contract Tavern is Ownable {
             // Emit event
             emit QuestRewardClaimed(_tokenAddress, _questIndex, msg.sender);
         }
+    }
+
+    // Let's the owner of the contract withdraw the current balance earned
+    // for quests with eth prizes
+    function withdrawOwnerBalance() public onlyOwner {
+        uint oldBalance = currentOwnerBalance;
+        // Check if there's any balance to withdraw
+        require(currentOwnerBalance > 0);
+
+        // Transfer balance
+        owner.transfer(currentOwnerBalance);
+
+        // Zero out the current owner balance
+        currentOwnerBalance = 0;
+
+        // Emit event
+        emit OwnerBalanceWithdrawn(owner, oldBalance);
     }
 
     // Returns wheter or not the _allegedWinner is an actual winner
@@ -193,6 +227,14 @@ contract Tavern is Ownable {
 
     function getQuestValid(address _tokenAddress, uint _questIndex) public view returns(bool) {
         return quests[_tokenAddress][_questIndex].valid;
+    }
+
+    function getQuestPrize(address _tokenAddress, uint _questIndex) public view returns(uint) {
+        return quests[_tokenAddress][_questIndex].prize;
+    }
+
+    function getQuestUnitPrize(address _tokenAddress, uint _questIndex) public view returns(uint) {
+        return SafeMath.div(quests[_tokenAddress][_questIndex].prize, quests[_tokenAddress][_questIndex].maxWinners);
     }
 
     function getQuestWinnersAmount(address _tokenAddress, uint _questIndex) public view returns(uint) {
