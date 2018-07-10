@@ -88,6 +88,7 @@ contract Tavern is Ownable {
             quests[_tokenAddress][_questIndex].hint,
             quests[_tokenAddress][_questIndex].maxWinners,
             quests[_tokenAddress][_questIndex].merkleRoot,
+            quests[_tokenAddress][_questIndex].merkleBody,
             quests[_tokenAddress][_questIndex].metadata,
             quests[_tokenAddress][_questIndex].prize
         );
@@ -196,10 +197,10 @@ contract Tavern is Ownable {
     }
 
     function getQuest(address _tokenAddress, uint _questIndex) public view returns (address,
-        uint, string, string, bytes32, uint, string, bool, uint, uint) {
+        uint, string, string, bytes32, string, uint, string, bool, uint, uint) {
         Quest memory quest = quests[_tokenAddress][_questIndex];
 
-        return (quest.creator, quest.index, quest.name, quest.hint, quest.merkleRoot, quest.maxWinners,
+        return (quest.creator, quest.index, quest.name, quest.hint, quest.merkleRoot, quest.merkleBody, quest.maxWinners,
             quest.metadata, quest.valid, quest.winnersIndex.length, quest.claimersIndex.length);
     }
 
