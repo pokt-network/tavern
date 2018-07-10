@@ -21,6 +21,7 @@ contract Tavern is Ownable {
         string name;
         string hint;
         bytes32 merkleRoot;
+        string merkleBody;
         uint maxWinners;
         string metadata;
         bool valid;
@@ -45,7 +46,7 @@ contract Tavern is Ownable {
     event OwnerBalanceWithdrawn(address _owner, uint _balanceWithdrawn);
 
     // Creates a new quest
-    function createQuest(address _tokenAddress, string _name, string _hint, uint _maxWinners, bytes32 _merkleRoot, string _metadata) public payable {
+    function createQuest(address _tokenAddress, string _name, string _hint, uint _maxWinners, bytes32 _merkleRoot, string _merkleBody, string _metadata) public payable {
         // If the quest is valid, create it
         Quest memory newQuest;
         uint questIndex = quests[_tokenAddress].length;
@@ -54,6 +55,7 @@ contract Tavern is Ownable {
         newQuest.name = _name;
         newQuest.hint = _hint;
         newQuest.merkleRoot = _merkleRoot;
+        newQuest.merkleBody = _merkleBody;
         newQuest.maxWinners = _maxWinners;
         newQuest.metadata = _metadata;
         if (msg.value > 0) {
@@ -219,6 +221,10 @@ contract Tavern is Ownable {
 
     function getQuestMerkleRoot(address _tokenAddress, uint _questIndex) public view returns(bytes32) {
         return quests[_tokenAddress][_questIndex].merkleRoot;
+    }
+
+    function getQuestMerkleBody(address _tokenAddress, uint _questIndex) public view returns(string) {
+        return quests[_tokenAddress][_questIndex].merkleBody;
     }
 
     function getQuestMaxWinners(address _tokenAddress, uint _questIndex) public view returns(uint) {
