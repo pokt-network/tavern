@@ -8,7 +8,10 @@ import "./TavernQuestReward.sol";
 contract Tavern is Ownable {
     using SafeMath for uint;
 
-    function initialize() isInitializer("Tavern", "0.0.1") public {
+    function initialize(address _owner) isInitializer("Tavern", "0.0.1") public {
+        require(!initialized);
+        owner = _owner;
+        initialized = true;
     }
 
     // Quest model
@@ -18,6 +21,7 @@ contract Tavern is Ownable {
         string name;
         string hint;
         bytes32 merkleRoot;
+        string merkleBody;
         uint maxWinners;
         string metadata;
         bool valid;
@@ -29,9 +33,10 @@ contract Tavern is Ownable {
     }
 
     // State
-    mapping (address => Quest[]) quests;
-    mapping (address => mapping (address => uint[])) questsPerCreator;
-    uint currentOwnerBalance;
+    mapping (address => Quest[]) public quests;
+    mapping (address => mapping (address => uint[])) public questsPerCreator;
+    uint public currentOwnerBalance;
+    bool internal initialized;
 
     // Events
     event QuestCreated(address _tokenAddress, uint _questIndex);
@@ -41,7 +46,7 @@ contract Tavern is Ownable {
     event OwnerBalanceWithdrawn(address _owner, uint _balanceWithdrawn);
 
     // Creates a new quest
-    function createQuest(address _tokenAddress, string _name, string _hint, uint _maxWinners, bytes32 _merkleRoot, string _metadata) public payable {
+    function createQuest(address _tokenAddress, string _name, string _hint, uint _maxWinners, bytes32 _merkleRoot, string _merkleBody, string _metadata) public payable {
         // If the quest is valid, create it
         Quest memory newQuest;
         uint questIndex = quests[_tokenAddress].length;
@@ -50,13 +55,14 @@ contract Tavern is Ownable {
         newQuest.name = _name;
         newQuest.hint = _hint;
         newQuest.merkleRoot = _merkleRoot;
+        newQuest.merkleBody = _merkleBody;
         newQuest.maxWinners = _maxWinners;
         newQuest.metadata = _metadata;
         if (msg.value > 0) {
             // If the quest has an eth prize require the amount of winners to be > 0
             require(newQuest.maxWinners > 0);
-            newQuest.prize = msg.value * SafeMath.div(9, 10);
-            currentOwnerBalance += msg.value * SafeMath.div(1, 10);
+            currentOwnerBalance = SafeMath.div(msg.value, 10);
+            newQuest.prize = SafeMath.sub(msg.value, currentOwnerBalance);
         }
 
         // Save quest
@@ -77,11 +83,13 @@ contract Tavern is Ownable {
 
         TavernQuestReward tokenInterface = TavernQuestReward(_tokenAddress);
         bool isValid = tokenInterface.validateQuest(
+            this,
             quests[_tokenAddress][_questIndex].creator,
             quests[_tokenAddress][_questIndex].name,
             quests[_tokenAddress][_questIndex].hint,
             quests[_tokenAddress][_questIndex].maxWinners,
             quests[_tokenAddress][_questIndex].merkleRoot,
+            quests[_tokenAddress][_questIndex].merkleBody,
             quests[_tokenAddress][_questIndex].metadata,
             quests[_tokenAddress][_questIndex].prize
         );
@@ -94,14 +102,14 @@ contract Tavern is Ownable {
     }
 
     // Submits proof of quest completion and mints reward
-    function submitProof(address _tokenAddress, uint _questIndex, bytes32[] _pathToRoot, bytes32 _proof) public {
+    function submitProof(address _tokenAddress, uint _questIndex, bytes32[] _proof, bytes32 _answer) public {
         Quest memory quest = quests[_tokenAddress][_questIndex];
 
         // Check quest is valid
         require(quest.valid == true);
 
         // Avoid creating more winners after the max amount of tokens are minted
-        require(quest.winnersIndex.length < quest.maxWinners);
+        require(quest.winnersIndex.length < quest.maxWinners || quest.maxWinners == 0);
 
         // Avoid the same winner spamming the contract
         require(!isWinner(_tokenAddress, _questIndex, msg.sender));
@@ -110,7 +118,7 @@ contract Tavern is Ownable {
         require(msg.sender != quest.creator);
 
         // Verify merkle proof
-        require(MerkleProof.verifyProof(_pathToRoot, quest.merkleRoot, _proof));
+        require(MerkleProof.verifyProof(_proof, quest.merkleRoot, _answer));
 
         // Add to winners list
         quests[_tokenAddress][_questIndex].winners[msg.sender] = true;
@@ -135,7 +143,7 @@ contract Tavern is Ownable {
         // Check if the alledged winner is actually a winner
         require(isWinner(_tokenAddress, _questIndex, msg.sender));
         // Check if the winner is not in the in the claimers list yet
-        require(!isClaimer(_tokenAddress, _questIndex, msg.sender));
+        require(isClaimer(_tokenAddress, _questIndex, msg.sender) == false);
 
         // NOTE: We used if instead of require in case manual validation of rewards want to be added
         // in the future, or if there's a bug in the token contract
@@ -174,7 +182,7 @@ contract Tavern is Ownable {
 
     // Returns wheter or not the _allegedClaimer is an actual claimer
     function isClaimer(address _tokenAddress, uint _questIndex, address _allegedClaimer) public view returns (bool) {
-        return quests[_tokenAddress][_questIndex].winners[_allegedClaimer];
+        return quests[_tokenAddress][_questIndex].claimers[_allegedClaimer];
     }
 
     function getQuestAmount(address _tokenAddress) public view returns (uint) {
@@ -190,10 +198,10 @@ contract Tavern is Ownable {
     }
 
     function getQuest(address _tokenAddress, uint _questIndex) public view returns (address,
-        uint, string, string, bytes32, uint, string, bool, uint, uint) {
+        uint, string, string, bytes32, string, uint, string, bool, uint, uint) {
         Quest memory quest = quests[_tokenAddress][_questIndex];
 
-        return (quest.creator, quest.index, quest.name, quest.hint, quest.merkleRoot, quest.maxWinners,
+        return (quest.creator, quest.index, quest.name, quest.hint, quest.merkleRoot, quest.merkleBody, quest.maxWinners,
             quest.metadata, quest.valid, quest.winnersIndex.length, quest.claimersIndex.length);
     }
 
@@ -215,6 +223,10 @@ contract Tavern is Ownable {
 
     function getQuestMerkleRoot(address _tokenAddress, uint _questIndex) public view returns(bytes32) {
         return quests[_tokenAddress][_questIndex].merkleRoot;
+    }
+
+    function getQuestMerkleBody(address _tokenAddress, uint _questIndex) public view returns(string) {
+        return quests[_tokenAddress][_questIndex].merkleBody;
     }
 
     function getQuestMaxWinners(address _tokenAddress, uint _questIndex) public view returns(uint) {
