@@ -83,6 +83,7 @@ contract Tavern is Ownable {
 
         TavernQuestReward tokenInterface = TavernQuestReward(_tokenAddress);
         bool isValid = tokenInterface.validateQuest(
+            this,
             quests[_tokenAddress][_questIndex].creator,
             quests[_tokenAddress][_questIndex].name,
             quests[_tokenAddress][_questIndex].hint,
@@ -142,7 +143,7 @@ contract Tavern is Ownable {
         // Check if the alledged winner is actually a winner
         require(isWinner(_tokenAddress, _questIndex, msg.sender));
         // Check if the winner is not in the in the claimers list yet
-        require(!isClaimer(_tokenAddress, _questIndex, msg.sender));
+        require(isClaimer(_tokenAddress, _questIndex, msg.sender) == false);
 
         // NOTE: We used if instead of require in case manual validation of rewards want to be added
         // in the future, or if there's a bug in the token contract
@@ -181,7 +182,7 @@ contract Tavern is Ownable {
 
     // Returns wheter or not the _allegedClaimer is an actual claimer
     function isClaimer(address _tokenAddress, uint _questIndex, address _allegedClaimer) public view returns (bool) {
-        return quests[_tokenAddress][_questIndex].winners[_allegedClaimer];
+        return quests[_tokenAddress][_questIndex].claimers[_allegedClaimer];
     }
 
     function getQuestAmount(address _tokenAddress) public view returns (uint) {
