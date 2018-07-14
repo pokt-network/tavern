@@ -20,6 +20,11 @@
   "homepage": "https://github.com/luyzdeleon/tavern#readme",
   "dependencies": {
     "openzeppelin-zos": "^1.9.1",
+    "truffle": "^4.1.13",
     "zos-lib": "^1.0.0"
+  },
+  "devDependencies": {
+    "ethereumjs-util": "^5.2.0",
+    "zos": "^1.0.0"
   }
 }
