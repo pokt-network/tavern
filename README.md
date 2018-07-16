@@ -80,5 +80,8 @@ The `Tavern` contract exposes multiple getter methods that allow for easy retrie
 
 ## Known Attack Vectors
 
-### Creators using multiple accounts to self-claim their own Quests
-This attack consists on a Quest creator creating a Quest and completing it with a different account.
+### Self-claiming quests
+This attack consists of a Quest creator creating a Quest and completing it with a different account. Can be mitigated by adding a public trusted quest validator before giving out reward.
+
+### Quest completion Sybil attack
+When one person creates many other accounts to complete the same quest. Can be mitigated by adding a public trusted quest validator before giving out reward.
