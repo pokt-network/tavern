@@ -1,0 +1,32 @@
+{
+  "contracts": {
+    "Tavern": {
+      "address": "0x0f8721d0c131d255672638dfffc912f2ad94ebb9",
+      "bytecodeHash": "72543a3e7b70a22693df465088a98c0ea23ced147b71d97f9d42c5476deb46e6"
+    }
+  },
+  "proxies": {
+    "Tavern": [
+      {
+        "address": "0xcd4b7ed0c227fa259e8851fafed9bc88430eebab",
+        "version": "0.0.1",
+        "implementation": "0x0f8721d0c131d255672638dfffc912f2ad94ebb9"
+      }
+    ]
+  },
+  "app": {
+    "address": "0xd0bbb94938cc083069fea5f5f9f6058d2ffe7399"
+  },
+  "version": "0.0.1",
+  "package": {
+    "address": "0xf4c4b292e8bcf21407c165bdbce6388d44428bdc"
+  },
+  "provider": {
+    "address": "0x62abd61f21738985bc34d5c1eb5d8ec215bde892"
+  },
+  "stdlib": {
+    "address": "0x35de7ba3457f9ec93b5b9f05b47c2515ea6255f3",
+    "name": "openzeppelin-zos",
+    "version": "1.9.1"
+  }
+}
