@@ -123,4 +123,22 @@ contract('Tavern', function (accounts) {
       assert.equal(questPrize.toNumber(), ethSent - expectedComission);
     });
   });
+
+  describe('#getQuest', function() {
+    it('should return an existing quest succesfully', async function() {
+      let txResult = await shouldCreateValidQuest(
+        40.6893,
+        -74.0447,
+        'This is a quest',
+        'This is a hint',
+        10,
+        'some metadata',
+        {from: accounts[0]}
+      );
+
+      let quest = await tavernProxy.getQuest(tavernQuestRewardTestInstance.address, txResult.logs[0].args._questIndex.toNumber());
+      assert.ok(quest);
+      assert.equal(quest.length, 11);
+    });
+  });
 });
