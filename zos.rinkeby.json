@@ -1,28 +1,28 @@
 {
   "contracts": {
     "Tavern": {
-      "address": "0x0f8721d0c131d255672638dfffc912f2ad94ebb9",
+      "address": "0x84f109fe29d2fb013f24eb0d3ec92bf5f1956772",
       "bytecodeHash": "72543a3e7b70a22693df465088a98c0ea23ced147b71d97f9d42c5476deb46e6"
     }
   },
   "proxies": {
     "Tavern": [
       {
-        "address": "0xcd4b7ed0c227fa259e8851fafed9bc88430eebab",
+        "address": "0xd480083db34e8c87987652ee90f41ddb311f37ff",
         "version": "0.0.1",
-        "implementation": "0x0f8721d0c131d255672638dfffc912f2ad94ebb9"
+        "implementation": "0x84f109fe29d2fb013f24eb0d3ec92bf5f1956772"
       }
     ]
   },
   "app": {
-    "address": "0xd0bbb94938cc083069fea5f5f9f6058d2ffe7399"
+    "address": "0xdb6bc931bb102dea7f9c815dd2c313337e0c7503"
   },
   "version": "0.0.1",
   "package": {
-    "address": "0xf4c4b292e8bcf21407c165bdbce6388d44428bdc"
+    "address": "0xad94ebd9d5a57605f29835a745fb8f8df5ff5a2c"
   },
   "provider": {
-    "address": "0x62abd61f21738985bc34d5c1eb5d8ec215bde892"
+    "address": "0xb4e6a184505c26567f9c669f79245bc1850e5f3f"
   },
   "stdlib": {
     "address": "0x35de7ba3457f9ec93b5b9f05b47c2515ea6255f3",

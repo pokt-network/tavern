@@ -7,7 +7,7 @@ By using Tavern you can easily integrate your own Token contract (ERC-721, ERC-2
 Below you can find the addresses for the different network Taverns.
 
 1. MainNet's Tavern: TBA
-2. Rinkeby's Tavern: `0xcd4b7ed0c227fa259e8851fafed9bc88430eebab`
+2. Rinkeby's Tavern: `0xd480083db34e8c87987652ee90f41ddb311f37ff`
 
 ## How it works
 
